@@ -1,20 +1,9 @@
 package com.schneeloch.tcoredirect;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.ProtocolException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.RedirectHandler;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.HttpContext;
-
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -52,42 +41,13 @@ public class ForwardAsyncTask extends AsyncTask<Object, Integer, Object>
 	protected Object doStuff()
 	{
 		try {
-			final URI uri = new URI(oldUri.getScheme(), oldUri.getUserInfo(), oldUri.getHost(), 
-					oldUri.getPort(), oldUri.getPath(), oldUri.getQuery(), oldUri.getFragment());
-
-			HttpHead head = new HttpHead(uri);
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			httpClient.setRedirectHandler(new RedirectHandler() {
-
-				@Override
-				public boolean isRedirectRequested(HttpResponse response,
-						HttpContext context) {
-					Header header = response.getFirstHeader("Location");
-					if (header != null)
-					{
-						newUrl = header.getValue();
-					}
-					else
-					{
-						report("Invalid t.co link: " + uri.toString());
-					}
-					return false;
-				}
-
-				@Override
-				public URI getLocationURI(HttpResponse response, HttpContext context)
-				throws ProtocolException {
-					return null;
-				}
-			});
 			
-			httpClient.execute(head);
+			final URI uri = new URI(oldUri.getScheme(), oldUri.getUserInfo(), "233.im", 
+					oldUri.getPort(), "/" + oldUri.getHost() + oldUri.getPath(), oldUri.getQuery(), oldUri.getFragment());
+
+			newUrl = uri.toString();
 		}
-		catch (ClientProtocolException e) {
-			report("Problem reading t.co link", e);
-		} catch (IOException e) {
-			report("Problem reading input", e);
-		} catch (URISyntaxException e) {
+		catch (URISyntaxException e) {
 			report("Problem parsing uri", e);
 		}
 		catch (Throwable t)
